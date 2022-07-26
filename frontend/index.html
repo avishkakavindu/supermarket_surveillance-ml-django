@@ -20,6 +20,8 @@
     <link rel="stylesheet" href="./styles/styles.css" />
 
     <title>Supermarket Application</title>
+
+    <script src="{% static 'js/scripts.js' %}"></script>
   </head>
   <body>
     <div class="container border border-dark border-2 rounded mt-5 pt-3">
@@ -35,11 +37,11 @@
       <div class="container pt-3">
         <div class="row">
             <div class="col">
-                <div class="row">
+                
                   <div class="card mb-3" style="max-width: 540px">
                     <div class="row g-0">
-                      <div class="col-md-4">
-                        <img src="..." class="img-fluid rounded-start" alt="..." />
+                      <div class="col-md-4 p-3">
+                        <img src="./imgs/sample.svg" class="img-fluid rounded-start" alt="..." />
                       </div>
                       <div class="col-md-8">
                         <div class="card-body">
@@ -47,20 +49,35 @@
                           <p class="card-text">
                             Check whether the customers wear masks
                           </p>
+                          <a href="mask_detection.html" class="btn btn-primary">MaskDetection</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card mb-3" style="max-width: 540px">
+                    <div class="row g-0">
+                      <div class="col-md-4 p-3">
+                        <img src="./imgs/sample.svg" class="img-fluid rounded-start" alt="..." />
+                      </div>
+                      <div class="col-md-8">
+                        <div class="card-body">
+                          <h5 class="card-title">Crowd Analysis</h5>
                           <p class="card-text">
-                            <small class="text-muted">Last updated 3 mins ago</small>
+                            Crowd analysis - analyses the crowd
                           </p>
+                          <a href="crowd_analysis.html" class="btn btn-primary">MaskDetection</a>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-      
-                <div class="row">
+
+                <div class="col">
                   <div class="card mb-3" style="max-width: 540px">
                     <div class="row g-0">
-                      <div class="col-md-4">
-                        <img src="..." class="img-fluid rounded-start" alt="..." />
+                      <div class="col-md-4 p-3">
+                        <img src="./imgs/sample.svg" class="img-fluid rounded-start" alt="..." />
                       </div>
                       <div class="col-md-8">
                         <div class="card-body">
@@ -68,26 +85,31 @@
                           <p class="card-text">
                             Detect potentially dangerous activities.
                           </p>
-                          <p class="card-text">
-                            <small class="text-muted">Last updated 3 mins ago</small>
-                          </p>
+                          <a href="behaviour.html" class="btn btn-primary">Behaviour Analysis</a>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-      
-              <div class="col">
-                  <div class="card">
-                      <img src="..." class="card-img-top" alt="...">
-                      <div class="card-body">
-                        <h5 class="card-title">Customer Analysis</h5>
-                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                  
+                  <div class="card mb-3" style="max-width: 540px">
+                    <div class="row g-0">
+                      <div class="col-md-4 p-3">
+                        <img src="./imgs/sample.svg" class="img-fluid rounded-start" alt="..." />
                       </div>
+                      <div class="col-md-8">
+                        <div class="card-body">
+                          <h5 class="card-title">Basket Analysis</h5>
+                          <p class="card-text">
+                            Add discounts to associated items.
+                          </p>
+                          <a href="basket_analysis.html" class="btn btn-primary">Basket Analysis</a>
+                        </div>
+                      </div>
+                    </div>
                   </div>
               </div>
+      
+             
         </div>
       </div>
     </div>

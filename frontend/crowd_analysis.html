@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+
+    <!-- Font Awesome -->
+    <script src="https://use.fontawesome.com/72b7383522.js"></script>
+    <!-- chart.js  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js" integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="./styles/styles.css" />
+
+    <title>Supermarket Application</title>
+  </head>
+  <body>
+    <div class="container border border-dark border-2 rounded mt-5 pt-3">
+      <div class="row">
+        <div class="col col-11 col-sm-11 d-flex justify-content-center">
+          <h3>SUPERMARKET DESKTOP APP</h3>
+        </div>
+        <div class="col col-1 col-sm-1 d-flex justify-content-center">
+          <i class="fa fa-lock fa-2x" aria-hidden="true"></i>
+        </div>
+      </div>
+
+      <div class="container pt-3">
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">
+              Gender Wise
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="fraud-tab" data-bs-toggle="tab" data-bs-target="#fraud" type="button" role="tab" aria-controls="profile" aria-selected="false">
+              Fraud
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="mask-tab" data-bs-toggle="tab" data-bs-target="#mask" type="button" role="tab" aria-controls="profile" aria-selected="false">
+              Masks
+            </button>
+          </li>
+        </ul>
+        <!-- END tabs -->
+
+        <div class="tab-content" id="myTabContent">
+          <!-- Camera container -->
+          <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+            <!-- gender wise -->
+            <ul class="nav  justify-content-center nav-pills mb-3 mt-3" id="pills-tab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="pills-today-tab" data-bs-toggle="pill" data-bs-target="#pills-today" type="button" role="tab" aria-controls="pills-today" aria-selected="true">
+                  Daily
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pills-week-tab" data-bs-toggle="pill" data-bs-target="#pills-week" type="button" role="tab" aria-controls="pills-week" aria-selected="false">
+                  Monthly
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pills-month-tab" data-bs-toggle="pill" data-bs-target="#pills-month" type="button" role="tab" aria-controls="pills-month" aria-selected="false">
+                  Annually
+                </button>
+              </li>
+            </ul>
+            <div class="tab-content" id="pills-tabContent">
+              <!-- Daily Distributions -->
+              <div class="tab-pane fade show active" id="pills-today" role="tabpanel" aria-labelledby="pills-home-tab">
+                <div class="row">
+                  <div class="col col-md-6">
+                    <canvas id="dailyChart" height="300px"></canvas>
+                    <script>
+                      const CANVAS_DAILY = document.getElementById('dailyChart');
+                      const DAILY_CHART = new Chart(CANVAS_DAILY, {
+                          type: 'bar',
+                          data: {
+                              labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+                              datasets: [
+                                {
+                                  label: 'Male',
+                                  data: [12, 19, 3, 5, 2, 3, 2],
+                                  backgroundColor: [
+                                      'rgba(255, 99, 132, 0.2)'
+                                      // 'rgba(54, 162, 235, 0.2)',
+                                      // 'rgba(255, 206, 86, 0.2)',
+                                      // 'rgba(75, 192, 192, 0.2)',
+                                      // 'rgba(153, 102, 255, 0.2)',
+                                      // 'rgba(255, 159, 64, 0.2)'
+                                  ],
+                                  borderColor: [
+                                      'rgba(255, 99, 132, 1)'
+                                      // 'rgba(54, 162, 235, 1)',
+                                      // 'rgba(255, 206, 86, 1)',
+                                      // 'rgba(75, 192, 192, 1)',
+                                      // 'rgba(153, 102, 255, 1)',
+                                      // 'rgba(255, 159, 64, 1)'
+                                  ],
+                                  borderWidth: 1
+                              },
+                              {
+                                  label: 'Female',
+                                  data: [1, 9, 13, 15, 20, 13, 12],
+                                  backgroundColor: [
+                                      'rgba(54, 162, 235, 0.2)'
+                                      // 'rgba(255, 206, 86, 0.2)',
+                                      // 'rgba(75, 192, 192, 0.2)',
+                                      // 'rgba(153, 102, 255, 0.2)',
+                                      // 'rgba(255, 159, 64, 0.2)'
+                                  ],
+                                  borderColor: [
+                                      'rgba(54, 162, 235, 1)'
+                                      // 'rgba(255, 206, 86, 1)',
+                                      // 'rgba(75, 192, 192, 1)',
+                                      // 'rgba(153, 102, 255, 1)',
+                                      // 'rgba(255, 159, 64, 1)'
+                                  ],
+                                  borderWidth: 1
+                              }
+                            ]
+                          },
+                          options: {
+                              plugins: {
+                                  title: {
+                                      display: true,
+                                      text: 'Daily Crowd Distribution'
+                                  }
+                              },
+                              scales: {
+                                  y: {
+                                      beginAtZero: true
+                                  }
+                              }
+                          }
+                      });
+                    </script>    
+                  </div>
+                  <div class="col col-md-6">
+                    <canvas id="dailyPieChart"></canvas>
+                    <script>
+                      const CANVAS_DAILY_PIE = document.getElementById('dailyPieChart');
+                      const DAILY_PIE_CHART = new Chart(CANVAS_DAILY_PIE, {
+                          type: 'pie',
+                          data: {
+                              labels: ['Male', 'Female'],
+                              datasets: [
+                                {
+                                  label: 'Weekly Gender Distribution',
+                                  data: [100, 120],
+                                  backgroundColor: [
+                                      'rgba(255, 99, 132, 0.2)',
+                                      'rgba(54, 162, 235, 0.2)'
+                                      // 'rgba(255, 206, 86, 0.2)',
+                                      // 'rgba(75, 192, 192, 0.2)',
+                                      // 'rgba(153, 102, 255, 0.2)',
+                                      // 'rgba(255, 159, 64, 0.2)'
+                                  ],
+                                  borderColor: [
+                                      'rgba(255, 99, 132, 1)',
+                                      'rgba(54, 162, 235, 1)',
+                                      // 'rgba(255, 206, 86, 1)',
+                                      // 'rgba(75, 192, 192, 1)',
+                                      // 'rgba(153, 102, 255, 1)',
+                                      // 'rgba(255, 159, 64, 1)'
+                                  ],
+                                  borderWidth: 1
+                              }
+                            ]
+                          },
+                          options: {
+                              plugins: {
+                                  title: {
+                                      display: true,
+                                      text: 'Week Gender Distribution'
+                                  }
+                              },
+                              scales: {
+                                  y: {
+                                      beginAtZero: true
+                                  }
+                              }
+                          }
+                      });
+                    </script>    
+                  </div>
+                </div>
+              </div>
+              <!-- END - Daily Distributions -->
+              <!-- Monthly Distribution -->
+              <div class="tab-pane fade" id="pills-week" role="tabpanel" aria-labelledby="pills-profile-tab">
+                <div class="row">
+                  <div class="col col-md-6">
+                    <canvas id="monthlyChart" height="300px"></canvas>
+                    <script>
+                      const CANVAS_MONTHLY = document.getElementById('monthlyChart');
+                      const MONTHLY_CHART = new Chart(CANVAS_MONTHLY, {
+                          type: 'bar',
+                          data: {
+                              labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                              datasets: [
+                                {
+                                  label: 'Male',
+                                  data: [12, 19, 3, 5, 2, 3, 2, 13, 30, 22, 45, 70],
+                                  backgroundColor: [
+                                      'rgba(255, 99, 132, 0.2)'
+                                  ],
+                                  borderColor: [
+                                      'rgba(255, 99, 132, 1)'
+                                  ],
+                                  borderWidth: 1
+                              },
+                              {
+                                  label: 'Female',
+                                  data: [1, 9, 13, 15, 20, 13, 12, 34, 43, 60, 100, 24],
+                                  backgroundColor: [
+                                      'rgba(54, 162, 235, 0.2)'
+                                  ],
+                                  borderColor: [
+                                      'rgba(54, 162, 235, 1)'
+                                  ],
+                                  borderWidth: 1
+                              }
+                            ]
+                          },
+                          options: {
+                              plugins: {
+                                  title: {
+                                      display: true,
+                                      text: 'Monthly Crowd Distribution'
+                                  }
+                              },
+                              scales: {
+                                  y: {
+                                      beginAtZero: true
+                                  }
+                              }
+                          }
+                      });
+                    </script>    
+                  </div>
+                  <div class="col col-md-6">
+                    <canvas id="monthlyPieChart"></canvas>
+                    <script>
+                      const CANVAS_MONTHLY_PIE = document.getElementById('monthlyPieChart');
+                      const MONTHLY_PIE_CHART = new Chart(CANVAS_MONTHLY_PIE, {
+                          type: 'pie',
+                          data: {
+                              labels: ['Male', 'Female'],
+                              datasets: [
+                                {
+                                  label: 'Monthly Gender Distribution',
+                                  data: [300, 320],
+                                  backgroundColor: [
+                                      'rgba(255, 99, 132, 0.2)',
+                                      'rgba(54, 162, 235, 0.2)'
+                                  ],
+                                  borderColor: [
+                                      'rgba(255, 99, 132, 1)',
+                                      'rgba(54, 162, 235, 1)'
+                                  ],
+                                  borderWidth: 1
+                              }
+                            ]
+                          },
+                          options: {
+                              plugins: {
+                                  title: {
+                                      display: true,
+                                      text: ' Annual Gender Distribution'
+                                  }
+                              },
+                              scales: {
+                                  y: {
+                                      beginAtZero: true
+                                  }
+                              }
+                          }
+                      });
+                    </script>    
+                  </div>
+                </div>
+              </div>
+              <!-- END - Monthly Distribution -->
+              <!-- Annual Distribution -->
+              <div class="tab-pane fade" id="pills-month" role="tabpanel" aria-labelledby="pills-contact-tab">
+                <div class="row">
+                  <div class="col col-md-6">
+                    <canvas id="annualyChart" height="300px"></canvas>
+                    <script>
+                      const CANVAS_ANNUALY = document.getElementById('annualyChart');
+                      const ANNUALY_CHART = new Chart(CANVAS_ANNUALY, {
+                          type: 'bar',
+                          data: {
+                              labels: ['2019', '2020', '2021', '2022'],
+                              datasets: [
+                                {
+                                  label: 'Male',
+                                  data: [1200, 1900, 2500, 3124],
+                                  backgroundColor: [
+                                      'rgba(255, 99, 132, 0.2)'
+                                  ],
+                                  borderColor: [
+                                      'rgba(255, 99, 132, 1)'
+                                  ],
+                                  borderWidth: 1
+                              },
+                              {
+                                  label: 'Female',
+                                  data: [1000, 900, 1300, 1500],
+                                  backgroundColor: [
+                                      'rgba(54, 162, 235, 0.2)'
+                                  ],
+                                  borderColor: [
+                                      'rgba(54, 162, 235, 1)'
+                                  ],
+                                  borderWidth: 1
+                              }
+                            ]
+                          },
+                          options: {
+                              plugins: {
+                                  title: {
+                                      display: true,
+                                      text: 'Annual Crowd Distribution'
+                                  }
+                              },
+                              scales: {
+                                  y: {
+                                      beginAtZero: true
+                                  }
+                              }
+                          }
+                      });
+                    </script>    
+                  </div>
+                  <div class="col col-md-6">
+                    <canvas id="annualPieChart"></canvas>
+                    <script>
+                      const CANVAS_ANNUAL_PIE = document.getElementById('annualPieChart');
+                      const ANNUAL_PIE_CHART = new Chart(CANVAS_ANNUAL_PIE, {
+                          type: 'pie',
+                          data: {
+                              labels: ['Male', 'Female'],
+                              datasets: [
+                                {
+                                  label: 'All Time Gender Distribution',
+                                  data: [5734, 6420],
+                                  backgroundColor: [
+                                      'rgba(255, 99, 132, 0.2)',
+                                      'rgba(54, 162, 235, 0.2)'
+                                  ],
+                                  borderColor: [
+                                      'rgba(255, 99, 132, 1)',
+                                      'rgba(54, 162, 235, 1)'
+                                  ],
+                                  borderWidth: 1
+                              }
+                            ]
+                          },
+                          options: {
+                              plugins: {
+                                  title: {
+                                      display: true,
+                                      text: 'All Time Gender Distribution'
+                                  }
+                              },
+                              scales: {
+                                  y: {
+                                      beginAtZero: true
+                                  }
+                              }
+                          }
+                      });
+                    </script>    
+                  </div>
+                </div>
+              </div>
+              <!-- END - Annual Distribution -->
+            </div>
+          </div>
+          <!-- END- Camera container -->
+          <div class="tab-pane fade" id="log" role="tabpanel" aria-labelledby="profile-tab">
+            
+            <!-- search -->
+            <div class="input-group mt-3 mb-3 float-end">
+              <input type="datetime-local" id="anomalydaytime" name="anomalydaytime">
+              <span class="input-group-text btn " id="basic-addon2">
+                <i class="fa fa-search"></i>
+              </span>
+            </div>
+            <!-- end search -->
+            
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">First</th>
+                  <th scope="col">Last</th>
+                  <th scope="col">Handle</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">1</th>
+                  <td>Mark</td>
+                  <td>Otto</td>
+                  <td>@mdo</td>
+                </tr>
+                <tr>
+                  <th scope="row">2</th>
+                  <td>Jacob</td>
+                  <td>Thornton</td>
+                  <td>@fat</td>
+                </tr>
+                <tr>
+                  <th scope="row">3</th>
+                  <td colspan="2">Larry the Bird</td>
+                  <td>@twitter</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+      
+        </div>
+
+       
+      </div>
+
+
+    </div>
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+    -->
+  </body>
+</html>
