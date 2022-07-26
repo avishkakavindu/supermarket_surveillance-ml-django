@@ -2,6 +2,16 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class Loyalty(models.Model):
+    """ Handle user loyalty points """
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    points = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return self.user.username
+
+
 class Camera(models.Model):
     """ Handle camera information """
 
@@ -59,6 +69,7 @@ class Product(models.Model):
     quantity = models.PositiveIntegerField()
     shelf = models.ForeignKey(Shelf, on_delete=models.DO_NOTHING)
     discount = models.FloatField()
+    loyalty_points = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return '{} {}'.format(self.name, self.id)
@@ -81,7 +92,7 @@ class OrderedProduct(models.Model):
 
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.DO_NOTHING)
-    quantity = models.IntegerField(default=1)
+    quantity = models.IntegerField(default=0)
 
     def __str__(self):
         return '{} {}'.format(self.order, self.product)

@@ -16,5 +16,6 @@ urlpatterns = [
     path('fraud-prediction/<int:incident_id>/', FraudDetectionAPIView.as_view(), name='fraud_detection'),
     path('crowd/', CrowdAPIView.as_view(), name='crowd'),
     path('association-rules/', AssociateRuleMiningDiscountAPIView.as_view(), name='assoc_rules'),
-    path('discount/', DiscountAPIView.as_view(), name='discount')
+    path('discount/', DiscountAPIView.as_view(), name='discount'),
+    path('order/', OrderAPIView.as_view(), name='order')
 ] + router.urls

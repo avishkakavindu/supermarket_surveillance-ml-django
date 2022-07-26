@@ -485,3 +485,59 @@ class DiscountAPIView(APIView):
 
         return Response(context, status=status.HTTP_200_OK)
 
+
+class OrderAPIView(APIView):
+    """ Add products, retrieve order details """
+
+    authentication_classes = [JWTTokenUserAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        order = Order.objects.filter(user=request.user.id).latest('date_time')
+
+        serializer = OrderSerializer(order)
+
+        context = {
+            'detail': serializer.data
+        }
+
+        return Response(context, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        product_id = request.POST['id']
+        quantity = request.POST['quantity']
+
+        order = Order.objects.filter(user=request.user.id).latest('date_time')
+
+        try:
+            product = Product.objects.get(pk=product_id)
+        except Product.DoesNotExist:
+            return Response({'detail': 'Product not found!'}, status=status.HTTP_404_NOT_FOUND)
+
+        ordered_product, created = OrderedProduct.objects.update_or_create(
+            order=order,
+            product=product
+        )
+
+        from django.db.models import F
+
+        ordered_product.quantity = F('quantity') + quantity
+        ordered_product.save()
+
+        loyalty, created = Loyalty.objects.update_or_create(
+            user=User.objects.get(pk=request.user.id)
+        )
+
+        loyalty.points = F('points') + product.loyalty_points
+        loyalty.save()
+
+        serializer = OrderedProductSerializer(OrderedProduct.objects.get(pk=ordered_product.id))
+
+        print(ordered_product)
+
+        context = {
+            'detail': 'Product added to order!',
+            'data': serializer.data
+        }
+
+        return Response(context, status=status.HTTP_200_OK)

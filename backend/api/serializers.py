@@ -71,6 +71,8 @@ class OrderedProductSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     """ Serialize ordered product """
 
+    product = ProductSerializer(read_only=True, many=True)
+
     class Meta:
         model = Order
-        fields = '__all__'
+        fields = ['user', 'product', 'date_time', 'discount', 'product']

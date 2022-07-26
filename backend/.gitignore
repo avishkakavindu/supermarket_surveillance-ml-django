@@ -1,5 +1,4 @@
 /venv/
 .idea
 /media/
-backend/api/trained_models/MobileNet_facialExpression.h5
 /api/trained_models/
