@@ -107,3 +107,13 @@ class Crowd(models.Model):
 
     def __str__(self):
         return str(self.date_time)
+
+
+class LoyaltyDiscount(models.Model):
+    """ Handle loyalty point based discount """
+
+    points = models.PositiveIntegerField(default=0)
+    discount = models.FloatField(default=0)
+
+    def __str__(self):
+        return '{} {}'.format(self.points, self.discount)

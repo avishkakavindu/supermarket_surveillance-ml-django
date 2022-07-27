@@ -429,17 +429,14 @@ class AssociateRuleMiningDiscountAPIView(APIView):
 class DiscountAPIView(APIView):
     """ Calculates the discount based on association rules """
 
-    authentication_classes = [JWTTokenUserAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
-
     def combinations(self, items):
         from itertools import compress, product
 
         return list(list(set(compress(items, mask))) for mask in product(*[[0, 1]] * len(items)))
 
-    def get(self, request, *args, **kwargs):
-        # get latest order
-        order = Order.objects.filter(user=request.user.id).latest('date_time')
+    def get(self, request, customer_id, *args, **kwargs):
+            # get latest order
+        order = Order.objects.filter(user=customer_id).latest('date_time')
 
         products_in_order = order.product.values('id').values_list('name', flat=True)
 
@@ -479,8 +476,12 @@ class DiscountAPIView(APIView):
 
         serializer = ProductDiscountSerializer(products, many=True)
 
+        loyalty_points = Loyalty.objects.get(user=customer_id).points
+        loyalty_discount = max(LoyaltyDiscount.objects.filter(points__lte=loyalty_points).values_list('discount', flat=True))
+
         context = {
-            'product_with_discounts': serializer.data
+            'product_with_discounts': serializer.data,
+            'loyalty_discount': loyalty_discount
         }
 
         return Response(context, status=status.HTTP_200_OK)
@@ -489,11 +490,8 @@ class DiscountAPIView(APIView):
 class OrderAPIView(APIView):
     """ Add products, retrieve order details """
 
-    authentication_classes = [JWTTokenUserAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request, *args, **kwargs):
-        order = Order.objects.filter(user=request.user.id).latest('date_time')
+    def get(self, request, customer_id, *args, **kwargs):
+        order = Order.objects.filter(user=customer_id).latest('date_time')
 
         serializer = OrderSerializer(order)
 
@@ -503,11 +501,11 @@ class OrderAPIView(APIView):
 
         return Response(context, status=status.HTTP_200_OK)
 
-    def post(self, request, *args, **kwargs):
-        product_id = request.POST['id']
+    def post(self, request, customer_id, *args, **kwargs):
+        product_id = request.POST['product_id']
         quantity = request.POST['quantity']
 
-        order = Order.objects.filter(user=request.user.id).latest('date_time')
+        order = Order.objects.filter(user=customer_id).latest('date_time')
 
         try:
             product = Product.objects.get(pk=product_id)
@@ -525,15 +523,13 @@ class OrderAPIView(APIView):
         ordered_product.save()
 
         loyalty, created = Loyalty.objects.update_or_create(
-            user=User.objects.get(pk=request.user.id)
+            user=User.objects.get(pk=customer_id)
         )
 
         loyalty.points = F('points') + product.loyalty_points
         loyalty.save()
 
         serializer = OrderedProductSerializer(OrderedProduct.objects.get(pk=ordered_product.id))
-
-        print(ordered_product)
 
         context = {
             'detail': 'Product added to order!',

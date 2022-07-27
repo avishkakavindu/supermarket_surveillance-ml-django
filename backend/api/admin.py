@@ -16,6 +16,10 @@ class ShelfAdmin(admin.ModelAdmin):
 class LoyaltyAdmin(admin.ModelAdmin):
     pass
 
+@admin.register(LoyaltyDiscount)
+class LoyaltyDiscountAdmin(admin.ModelAdmin):
+    pass
+
 
 @admin.register(FeedBack)
 class FeedBackAdmin(admin.ModelAdmin):
