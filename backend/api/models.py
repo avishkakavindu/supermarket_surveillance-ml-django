@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import datetime
 
 
 class Loyalty(models.Model):
@@ -103,7 +104,8 @@ class Crowd(models.Model):
 
     crowd_count = models.IntegerField(default=0)
     media_file = models.FileField(upload_to='uploads/', default='default.png')
-    date_time = models.DateTimeField(auto_now_add=True)
+    date_time = models.DateTimeField(default=datetime.now)
+    date_time.editable = True
 
     def __str__(self):
         return str(self.date_time)

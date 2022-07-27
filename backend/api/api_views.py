@@ -537,3 +537,53 @@ class OrderAPIView(APIView):
         }
 
         return Response(context, status=status.HTTP_200_OK)
+
+
+class FutureCrowdForecastAPIView(APIView):
+    """ Gets future forecast """
+
+    def get(self, request, *args, **kwargs):
+        crowd = Crowd.objects.all().values('date_time', 'crowd_count')
+
+        df = pd.DataFrame.from_records(crowd)
+        if df.shape[0] < 10:
+            context = {
+                'detail': 'Crowd records insufficient!'
+            }
+            return Response(context, status=status.HTTP_200_OK)
+
+        df.rename(columns={'crowd_count': 'y', 'date_time': 'ds'}, inplace=True)
+        df['ds'] = df['ds'].dt.tz_localize(None)
+
+        from prophet import Prophet
+
+        model = Prophet()
+        model.fit(df)
+
+        future = model.make_future_dataframe(periods=7)
+
+        # r, we are mainly interested in ds, yhat, yhat_lower and yhat_upper.
+        # yhat is our predicted forecast, yhat_lower is the lower bound for our
+        # predictions and yhat_upper is the upper bound for our predictions.
+        forecast = model.predict(future)
+
+        forecast = forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
+        forecast['actual_value'] = df['y']
+        forecast.rename(
+            columns={
+                'ds': 'date',
+                'yhat': 'predictions',
+                'yhat_lower': 'lower_bound',
+                'yhat_upper': 'higher_bound'
+            }, inplace=True
+        )
+
+        forecast = forecast.fillna('nan')
+
+        print(forecast.head(50))
+
+        context = {
+            'detail': forecast
+        }
+
+        return Response(context)
