@@ -18,5 +18,5 @@ urlpatterns = [
     path('association-rules/', AssociateRuleMiningDiscountAPIView.as_view(), name='assoc_rules'),
     path('discount/<int:customer_id>/', DiscountAPIView.as_view(), name='discount'),
     path('order/<int:customer_id>/', OrderAPIView.as_view(), name='order'),
-    path('crowd-forecast/', FutureCrowdForecastAPIView.as_view(), name='crowd_forecast')
+    path('crowd-forecast/', FutureCrowdForecastAPIView.as_view(), name='crowd_forecast'),
 ] + router.urls

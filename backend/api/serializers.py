@@ -76,3 +76,5 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['user', 'product', 'date_time', 'discount', 'product']
+
+

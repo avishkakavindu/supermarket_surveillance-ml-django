@@ -580,10 +580,11 @@ class FutureCrowdForecastAPIView(APIView):
 
         forecast = forecast.fillna('nan')
 
-        print(forecast.head(50))
+        # print(forecast.head(50))
 
         context = {
             'detail': forecast
         }
 
-        return Response(context)
+        return Response(context, status=status.HTTP_200_OK)
+
