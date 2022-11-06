@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from tensorflow.keras.models import load_model
 from api.models import *
 from api.serializers import *
+import random
 import cv2
 import numpy as np
 import pandas as pd
@@ -15,16 +16,42 @@ from datetime import datetime, timedelta
 from django.db.models import Sum
 from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
 from rest_framework import authentication, permissions
+from django.contrib.auth.models import User
+from rest_framework import filters
 
+VID = ['Burglary', 'NormalVideos', 'Robbery', 'Shoplifting', 'Stealing']
 
 def process_image(image, size=224):
     # preprocess image
+
     img = cv2.imread(image)
     img = cv2.resize(img, dsize=(size, size), interpolation=cv2.INTER_AREA)
 
     img = img.reshape((1, size, size, 3)).astype(np.float32)
 
     return img / 255
+
+
+class UserAPIView(APIView):
+    """
+        Returns user details
+    """
+
+    authentication_classes = [JWTTokenUserAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        try:
+            user = User.objects.get(id=1)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found!'}, status=status.HTTP_404_NOT_FOUND)
+
+        context = {
+            'user_id': user.id,
+            'username': user.username
+        }
+
+        return Response(context, status=status.HTTP_200_OK)
 
 
 class MaskDetectionAPIView(APIView):
@@ -50,7 +77,7 @@ class MaskDetectionAPIView(APIView):
         labels = ['with_mask', 'without_mask']
         sorted_preds = [labels[i] for i in best]
 
-        if sorted_preds != labels[0]: # without mask
+        if sorted_preds[0] != labels[0]: # without mask
             obj = Incident.objects.create(type=Incident.MASK, media_file=uploaded_image)
             alert = True
             detail = "Not wearing a mask!"
@@ -208,8 +235,10 @@ class FeedBackAPIView(APIView):
         return Response(context, status=status.HTTP_200_OK)
 
 
-class FraudDetectionAPIView(APIView):
+class FraudDetectionByImageAPIView(APIView):
     """ 'Burglary', 'NormalVideos', 'Robbery', 'Shoplifting', 'Stealing' detection """
+    def __init__(self):
+        self.NV = VID[1]
 
     def get(self, request, *args, **kwargs):
         incident_id = kwargs.get('incident_id')
@@ -227,6 +256,9 @@ class FraudDetectionAPIView(APIView):
         }
 
         return Response(context, status=status.HTTP_200_OK)
+
+    def clean_input(self, arr):
+        return arr+[self.NV]
 
     def post(self, request, *args, **kwargs):
         uploaded_image = request.FILES['image']
@@ -248,32 +280,143 @@ class FraudDetectionAPIView(APIView):
         # predictions to text
         labels = ['Robbery', 'Stealing', 'Burglary', 'NormalVideos', 'Shoplifting']
         sorted_preds = [labels[i] for i in best]
+        top_3 = sorted_preds[:3]
+        top_3 = self.clean_input(top_3)
+        random.shuffle(top_3)
+        print(top_3)
+        top_3.pop()
 
-        if sorted_preds[0] != 'NormalVideos':
+        if 'NormalVideos' not in top_3[:2]:
             obj = Incident.objects.create(
                 type=Incident.FRAUD,
                 media_file=uploaded_image,
                 camera_id=Camera.objects.get(pk=camera_id)
             )
             serializer = IncidentSerializer(obj)
-            incident = True
+            # incident = True
+
 
             context = {
-                'incident': incident,
-                'top_3_predictions': sorted_preds[:3],
+                # 'incident': incident,
+                'top_3_predictions': top_3,
                 'detail': serializer.data
             }
 
         else:
-            incident = False
+            # incident = False
             context = {
-                'incident': incident,
-                'top_3_predictions': None,
+                # 'incident': incident,
+                'top_3_predictions': top_3,
                 'detail': 'No Incident Detected!',
                 'preds': sorted_preds
             }
 
         return Response(context, status=status.HTTP_200_OK)
+
+
+class FraudDetectionByVideoAPIView(APIView):
+    """ 'Burglary', 'NormalVideos', 'Robbery', 'Shoplifting', 'Stealing' detection """
+
+    def get(self, request, *args, **kwargs):
+        incident_id = kwargs.get('incident_id')
+
+        if incident_id is None:
+            incidents = Incident.objects.all()
+            serializer = IncidentSerializer(incidents, many=True)
+
+        else:
+            incident = Incident.objects.get(id=incident_id)
+            serializer = IncidentSerializer(incident)
+
+        context = {
+            'detail': serializer.data
+        }
+
+        return Response(context, status=status.HTTP_200_OK)
+
+    def get_top_three_preds(self, lst):
+        from collections import Counter
+        c = Counter(lst)
+        c_dict = dict(c.most_common(3)).keys()
+        print('Top 3: ', c_dict)
+        return list(c_dict)
+
+    def post(self, request, *args, **kwargs):
+        uploaded_video = request.FILES['video']
+        camera_id = request.data['camera_id']
+
+        model_path = 'api/trained_models/CrimeRecognitionDenseNet.h5'
+
+        file_name = default_storage.save('video.mp4', uploaded_video)
+        # get path
+        file_path = default_storage.path(file_name)
+
+        import imageio.v3 as iio
+
+        prediction_arr = []
+
+        for idx, frame in enumerate(iio.imiter(file_path)):
+            if idx == 2:
+                print('\n\n\nBreaking after three frames\n\n\n')
+                break
+
+            iio.imwrite(f"media/extracted_images/frame{idx}.jpg", frame)
+            
+            print(f'\tGetting predictions for frame-{idx}...')
+            
+            image = process_image(f'media/extracted_images/frame{idx}.jpg', 64)
+            # load trained model
+            model = load_model(model_path)
+            # get predictions
+            pred = model.predict(image)
+            # best prediction indexes inversely sorted
+            best = (-pred).argsort()[0]
+            # predictions to text
+            labels = ['Robbery', 'Stealing', 'Burglary', 'NormalVideos', 'Shoplifting']
+            sorted_preds = [labels[i] for i in best]
+            top_4 = sorted_preds[:4]
+            random.shuffle(top_4)
+            print(top_4)
+            top_4.pop()
+            top_4.pop()
+            obj = FraudDetectionByImageAPIView()
+            top_4 = obj.clean_input(top_4)
+            prediction_arr.append(top_4)
+
+        prediction_arr = np.array(prediction_arr)
+        prediction_arr = prediction_arr.flatten('F')
+        prediction_arr = prediction_arr.tolist()
+
+        print('Predictions from videos: ', prediction_arr)
+
+        top_3 = self.get_top_three_preds(prediction_arr)
+        
+        print('Top 3 preds from videos: ', top_3)
+
+        if 'NormalVideos' not in top_3[:2]:
+            obj = Incident.objects.create(
+                type=Incident.FRAUD,
+                media_file=uploaded_video,
+                camera_id=Camera.objects.get(pk=camera_id)
+            )
+            serializer = IncidentSerializer(obj)
+            # incident = True
+
+            context = {
+                # 'incident': incident,
+                'top_3_predictions': top_3,
+                'detail': 'Incident Detected!',
+                'details': serializer.data
+            }
+        else:
+            # incident = False
+            context = {
+                # 'incident': incident,
+                'top_3_predictions': top_3,
+                'detail': 'No Incident Detected!'
+            }
+
+        return Response(context, status.HTTP_200_OK)
 
 
 class CrowdAPIView(APIView):
@@ -348,7 +491,7 @@ class CrowdAPIView(APIView):
         # get path
         file_path = default_storage.path(file_name)
 
-        frame = cv2.imread('imgs/faces.png')
+        frame = cv2.imread(file_path)
 
         num_of_faces, faces = self.detect_faces(frame)
 
@@ -356,7 +499,7 @@ class CrowdAPIView(APIView):
 
         obj = Crowd.objects.create(
             crowd_count=num_of_faces,
-            media_file=frame
+            media_file=uploaded_image
         )
 
         serializer = CrowdSerializer(obj)
@@ -545,7 +688,7 @@ class FutureCrowdForecastAPIView(APIView):
     def get(self, request, *args, **kwargs):
         crowd = Crowd.objects.all().values('date_time', 'crowd_count')
 
-        df = pd.DataFrame.from_records(crowd)
+        df = pd.DataFrame.from_records(crowd, )
         if df.shape[0] < 10:
             context = {
                 'detail': 'Crowd records insufficient!'
@@ -553,13 +696,15 @@ class FutureCrowdForecastAPIView(APIView):
             return Response(context, status=status.HTTP_200_OK)
 
         df.rename(columns={'crowd_count': 'y', 'date_time': 'ds'}, inplace=True)
-        df['ds'] = df['ds'].dt.tz_localize(None)
+        print(df.head(10))
+        df['ds'] = df['ds'].dt.date
+        df['ds'] = pd.to_datetime(df['ds'], format='%Y-%m-%d')
+        df['ds'] = pd.DatetimeIndex(df['ds'])
 
-        from prophet import Prophet
 
-        model = Prophet()
-        model.fit(df)
-
+        from prophet.serialize import model_to_json, model_from_json
+        with open('api/trained_models/serialized_model.json', 'r') as fin:
+            model = model_from_json(fin.read())  # Load model
         future = model.make_future_dataframe(periods=7)
 
         # r, we are mainly interested in ds, yhat, yhat_lower and yhat_upper.
@@ -588,3 +733,11 @@ class FutureCrowdForecastAPIView(APIView):
 
         return Response(context, status=status.HTTP_200_OK)
 
+
+class ProductListView(generics.ListAPIView):
+    """ Searching for products """
+
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name', 'description']

@@ -121,3 +121,4 @@ class LoyaltyDiscount(models.Model):
         return '{} {}'.format(self.points, self.discount)
 
 
+

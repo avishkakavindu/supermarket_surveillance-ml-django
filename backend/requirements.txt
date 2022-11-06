@@ -9,7 +9,7 @@ certifi==2022.6.15
 cffi==1.15.1
 charset-normalizer==2.1.0
 clang==5.0
-cmdstanpy==1.0.4
+cmdstanpy==1.0.7
 colorama==0.4.5
 convertdate==2.4.0
 coreapi==2.3.3
@@ -38,6 +38,8 @@ h5py==3.1.0
 hijri-converter==2.2.4
 holidays==0.14.2
 idna==3.3
+imageio==2.22.2
+imageio-ffmpeg==0.4.7
 importlib-metadata==4.12.0
 itypes==1.2.0
 Jinja2==3.1.2
@@ -48,6 +50,7 @@ kiwisolver==1.4.4
 korean-lunar-calendar==0.2.1
 libclang==14.0.1
 LunarCalendar==0.0.9
+manage.py==0.2.10
 Markdown==3.3.7
 MarkupSafe==2.1.1
 matplotlib==3.5.2
@@ -59,8 +62,9 @@ opt-einsum==3.3.0
 packaging==21.3
 pandas==1.1.5
 Pillow==9.2.0
-prophet==1.1
+prophet==1.1.1
 protobuf==3.19.4
+psutil==5.9.3
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycparser==2.21
